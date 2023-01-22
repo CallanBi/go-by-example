@@ -103,6 +103,7 @@ func connect(reader *bufio.Reader, conn net.Conn) (err error) {
 	// DST.ADDR 一个可变长度的值
 	// DST.PORT 目标端口，固定2个字节
 
+	// 先读取4个字节
 	buf := make([]byte, 4)
 	_, err = io.ReadFull(reader, buf)
 	if err != nil {
@@ -122,13 +123,17 @@ func connect(reader *bufio.Reader, conn net.Conn) (err error) {
 		if err != nil {
 			return fmt.Errorf("read atyp failed:%w", err)
 		}
+		// ipv4 addr 四个字节
+		// Sprintf 组成完整的ip地址字符串
 		addr = fmt.Sprintf("%d.%d.%d.%d", buf[0], buf[1], buf[2], buf[3])
 	case atypeHOST:
+		// 第一个字节表示域名长度
 		hostSize, err := reader.ReadByte()
 		if err != nil {
 			return fmt.Errorf("read hostSize failed:%w", err)
 		}
 		host := make([]byte, hostSize)
+		// 填充host
 		_, err = io.ReadFull(reader, host)
 		if err != nil {
 			return fmt.Errorf("read host failed:%w", err)
@@ -170,6 +175,7 @@ func connect(reader *bufio.Reader, conn net.Conn) (err error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// 双向转发
 	go func() {
 		_, _ = io.Copy(dest, reader)
 		cancel()

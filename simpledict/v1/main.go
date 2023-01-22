@@ -8,9 +8,13 @@ import (
 	"strings"
 )
 
+// 由 https://curlconverter.com/go/ 生成
 func main() {
 	client := &http.Client{}
+	// strings.NewReader() 用于将字符串转换为 io.Reader(一个流)
+	// v1中输入是固定的，需要 json 序列化
 	var data = strings.NewReader(`{"trans_type":"en2zh","source":"good"}`)
+	// 因为body可能是很大的一个文件，全部放在内存不好，所以这里data是一个流，只需要占用很小的内存
 	req, err := http.NewRequest("POST", "https://api.interpreter.caiyunai.com/v1/dict", data)
 	if err != nil {
 		log.Fatal(err)
@@ -37,6 +41,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// 按照golang的惯用写法，拿到请求后直接defer关闭
 	defer resp.Body.Close()
 	bodyText, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

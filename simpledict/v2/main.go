@@ -18,6 +18,7 @@ type DictRequest struct {
 func main() {
 	client := &http.Client{}
 	request := DictRequest{TransType: "en2zh", Source: "good"}
+	// 序列化成一个 json 数组
 	buf, err := json.Marshal(request)
 	if err != nil {
 		log.Fatal(err)
@@ -51,6 +52,7 @@ func main() {
 	}
 	defer resp.Body.Close()
 	bodyText, err := ioutil.ReadAll(resp.Body)
+	// bodyText 还是 byte[] 的形式，在 golang 的一般实践中会反序列化到结构体中(不会像 js 等动态类型语言一样直接取就可以取到)
 	if err != nil {
 		log.Fatal(err)
 	}

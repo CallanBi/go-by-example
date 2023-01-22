@@ -18,11 +18,13 @@ func main() {
 
 	fmt.Println("Please input your guess")
 	reader := bufio.NewReader(os.Stdin)
+	// 读取一行
 	input, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Println("An error occured while reading input. Please try again", err)
 		return
 	}
+	// 去掉换行符
 	input = strings.Trim(input, "\r\n")
 
 	guess, err := strconv.Atoi(input)

@@ -1,3 +1,4 @@
+// 使用 curl --socks5 127.0.0.1:1080 -v http://www.qq.com 来测试
 package main
 
 import (
@@ -40,6 +41,8 @@ func process(conn net.Conn) {
 	log.Println("auth success")
 }
 
+// @params  reader 只读流
+// @params  conn   原始 TCP 连接
 func auth(reader *bufio.Reader, conn net.Conn) (err error) {
 	// +----+----------+----------+
 	// |VER | NMETHODS | METHODS  |
@@ -63,12 +66,15 @@ func auth(reader *bufio.Reader, conn net.Conn) (err error) {
 	if err != nil {
 		return fmt.Errorf("read methodSize failed:%w", err)
 	}
+	// 创建缓冲区
 	method := make([]byte, methodSize)
+	// 用 io.ReadFull 读取所有的数据
 	_, err = io.ReadFull(reader, method)
 	if err != nil {
 		return fmt.Errorf("read method failed:%w", err)
 	}
 	log.Println("ver", ver, "method", method)
+	log.Println("methodSize", methodSize)
 	// +----+--------+
 	// |VER | METHOD |
 	// +----+--------+
